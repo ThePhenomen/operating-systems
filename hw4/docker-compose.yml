@@ -1,0 +1,32 @@
+services:
+
+  hello-world-app:
+    image: hashicorp/http-echo
+    command: ["-text=hello world"]
+    networks:
+      - hello-world-network
+
+  my-app:
+    build:
+      context: my-app
+      dockerfile: Dockerfile
+    volumes:
+      - /tmp/my-app/:/opt/files/
+    networks:
+      - hello-world-network
+
+  nginx:
+    image: nginx:1.28.0
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - hello-world-app
+    networks:
+      - hello-world-network
+
+networks:
+
+  hello-world-network:
+    driver: bridge
